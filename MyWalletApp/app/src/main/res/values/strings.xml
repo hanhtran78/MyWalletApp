@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">My Wallet App</string>
+    <string name="login_title">Passcode Lock</string>
+    <string name="wallet_manager_title">Wallet Manager</string>
+    <string name="add_new_item_title">Add New</string>
+    <string name="detail_report_title">Detail Report</string>
+    <string name="edit_item_title">Edit</string>
+    <string name="enter_your_passcode">Enter Your Passcode</string>
+    <string name="set_new_passcode">Set New Passcode</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
