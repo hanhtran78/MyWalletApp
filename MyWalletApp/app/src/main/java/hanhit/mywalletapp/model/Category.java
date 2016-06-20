@@ -32,11 +32,11 @@ public class Category implements Serializable{
         this.nameCategory = nameCategory;
     }
 
-    public String getNameIconCotegory() {
+    public String getNameIconCategory() {
         return nameIconCategory;
     }
 
-    public void setNameIconCotegory(String nameIconCotegory) {
+    public void setNameIconCategory(String nameIconCotegory) {
         this.nameIconCategory = nameIconCotegory;
     }
 }

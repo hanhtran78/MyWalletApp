@@ -98,7 +98,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         return numRows;
     }
 
-    public boolean addItem(Item item) {
+    public boolean insertItem(Item item) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues cv = new ContentValues();
         cv.put(COL_ID_ITEM, item.getIdItem());
@@ -110,6 +110,32 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         db.insert(TABLE_ITEMS, null, cv);
         return true;
+    }
+
+    public boolean insertCategory(Category category) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_ID_CATEGORY, category.getIdCategory());
+        cv.put(COL_NAME_CATEGORY, category.getNameCategory());
+        cv.put(COL_NAME_IMAGE, category.getNameIconCategory());
+        if ((db.insert(TABLE_CATEGORY, null, cv) != 0))
+            return true;
+        return false;
+    }
+
+    public ArrayList<String> getAllCategory() {
+        ArrayList<String> array_list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select " + COL_NAME_CATEGORY + " from " + TABLE_CATEGORY, null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            array_list.add(
+                    res.getString(res.getColumnIndex(COL_NAME_CATEGORY)));
+            res.moveToNext();
+        }
+        return array_list;
     }
 
     public boolean updateItem(Item item) {
@@ -134,6 +160,27 @@ public class MyDatabase extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select * from items", null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            array_list.add(new Item(
+                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
+                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
+                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
+                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
+                    res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
+            );
+            res.moveToNext();
+        }
+        return array_list;
+    }
+
+    public ArrayList<Item> getAllItemByDate(String date) {
+        ArrayList<Item> array_list = new ArrayList<>();
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from items where " + COL_DATE_ITEM + "=" + date, null);
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {

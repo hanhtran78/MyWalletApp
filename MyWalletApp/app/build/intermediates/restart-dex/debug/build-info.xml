@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<instant-run
+    abi="armeabi-v7a,armeabi"
+    api-level="19"
+    density="xhdpi"
+    format="7"
+    timestamp="293847983017587"
+    token="852733729478167059"
+    verifier="COMPATIBLE" >
+
+    <task
+        name="javac"
+        duration="102" />
+    <task
+        name="instant-run-dex"
+        duration="445" />
+    <task
+        name="instant-run-transform"
+        duration="69" />
+    <task
+        name="verifier"
+        duration="5" />
+
+    <artifact
+        location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\reload-dex\debug\classes.dex"
+        type="RELOAD_DEX" />
+
+    <build timestamp="293785785797678" >
+        <artifact
+            location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\outputs\apk\app-debug.apk"
+            type="MAIN" />
+    </build>
+    <build
+        timestamp="293847983017587"
+        verifier="COMPATIBLE" >
+        <artifact
+            location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\reload-dex\debug\classes.dex"
+            type="RELOAD_DEX" />
+    </build>
+
+</instant-run>

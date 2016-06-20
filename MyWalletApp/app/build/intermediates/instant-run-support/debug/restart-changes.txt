@@ -1,0 +1,5 @@
+CHANGED,D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\transforms\instantRun\debug\folders\1\5\main\hanhit\mywalletapp\WalletManagerActivity.class
+CHANGED,D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\transforms\instantRun\debug\folders\1\5\main\hanhit\mywalletapp\WalletManagerActivity$2.class
+CHANGED,D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\transforms\instantRun\debug\folders\1\5\main\hanhit\mywalletapp\WalletManagerActivity$4.class
+CHANGED,D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\transforms\instantRun\debug\folders\1\5\main\hanhit\mywalletapp\WalletManagerActivity$1.class
+CHANGED,D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\transforms\instantRun\debug\folders\1\5\main\hanhit\mywalletapp\WalletManagerActivity$3.class

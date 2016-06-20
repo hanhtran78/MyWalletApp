@@ -16,18 +16,21 @@ import java.util.ArrayList;
 
 import hanhit.mywalletapp.ItemActivity;
 import hanhit.mywalletapp.R;
+import hanhit.mywalletapp.database.MyDatabase;
 import hanhit.mywalletapp.model.Item;
 
 /**
  * Created by hanh.tran on 6/16/2016.
  */
-public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
+public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
 
     private Activity mContext;
     private ArrayList<Item> itemList;
-    private int currentPosition;
+    private static final int EDIT_ITEM = 0;
 
-    public AdapterListviewWalletManager(Activity context, int resource, ArrayList<Item> objects) {
+    private MyDatabase myDb;
+
+    public AdapterListViewWalletManager(Activity context, int resource, ArrayList<Item> objects) {
         super(context, resource, objects);
         this.mContext = context;
         this.itemList = objects;
@@ -56,7 +59,7 @@ public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
             holder = (ViewHolderItem) view.getTag();
         }
 
-        Item item = itemList.get(position);
+        final Item item = itemList.get(position);
         holder.txtNameItem.setText(item.getNameItem());
         holder.txtDateOfItem.setText(item.getDateItem());
         holder.txtValueItem.setText(item.getValueItem() + ",000 VND");
@@ -66,6 +69,15 @@ public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
         } else {
             holder.txtValueItem.setTextColor(mContext.getResources().getColor(R.color.color_expense));
         }
+
+        if (item.getIdCategoryItem() == 0) {
+            holder.showImageByName(mContext, "ic_movie");
+        } else if (item.getIdCategoryItem() == 1) {
+            holder.showImageByName(mContext, "ic_shop");
+        } else {
+            holder.showImageByName(mContext, "ic_another");
+        }
+
         holder.image_edit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,14 +86,23 @@ public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
                 bundle.putString("title", "Edit");
                 bundle.putSerializable("object", itemSelected);
                 intentEdit.putExtra("data", bundle);
-                mContext.startActivity(intentEdit);
+                mContext.startActivityForResult(intentEdit, EDIT_ITEM);
             }
         });
+
 
         holder.image_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(mContext, "Delete item at positon " + position, Toast.LENGTH_SHORT).show();
+                myDb = new MyDatabase(mContext);
+
+                if (myDb.deleteItem(item.getIdItem()) != 0) {
+                    itemList.remove(position);
+                    Toast.makeText(mContext, "Deleted success!", Toast.LENGTH_SHORT).show();
+                    notifyDataSetChanged();
+                } else {
+                    Toast.makeText(mContext, "Delete fail! " + myDb.deleteItem(item.getIdItem()), Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -89,9 +110,6 @@ public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-//                currentPosition = position;
-//                Toast.makeText(mContext, "prev " + currentPosition + "- pos " + position, Toast.LENGTH_SHORT).show();
-
                 holder.image_edit.setVisibility(View.VISIBLE);
                 holder.image_delete.setVisibility(View.VISIBLE);
                 return false;
@@ -107,5 +125,14 @@ public class AdapterListviewWalletManager extends ArrayAdapter<Item> {
         private TextView txtNameItem;
         private TextView txtDateOfItem;
         private TextView txtValueItem;
+
+        public void showImageByName(Activity mActivity, String nameImage) {
+            String pkgName = mActivity.getPackageName();
+            int resId = mActivity.getResources().getIdentifier(nameImage, "mipmap", pkgName);
+
+            if (resId != 0) {
+                image_category_item.setImageResource(resId);
+            }
+        }
     }
 }

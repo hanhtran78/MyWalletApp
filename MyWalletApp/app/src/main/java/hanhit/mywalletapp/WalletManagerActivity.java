@@ -2,6 +2,7 @@ package hanhit.mywalletapp;
 
 import android.app.Dialog;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,9 +14,13 @@ import android.widget.Toast;
 
 import com.samsistemas.calendarview.widget.CalendarView;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
-import hanhit.mywalletapp.adapter.AdapterListviewWalletManager;
+import hanhit.mywalletapp.adapter.AdapterListViewWalletManager;
+import hanhit.mywalletapp.database.MyDatabase;
 import hanhit.mywalletapp.model.Item;
 
 public class WalletManagerActivity extends AppCompatActivity {
@@ -23,26 +28,30 @@ public class WalletManagerActivity extends AppCompatActivity {
     private CalendarView mCalendar;
     private ImageView mImageAddItem;
     private ListView mListViewItem;
-    private ImageView mImageReport, mImageEdit, mImageDelete;
+    private ImageView mImageReport;
+    private TextView mTextHide;
 
+    private static final int EDIT_ITEM = 0;
+
+    private MyDatabase myDB;
     private ArrayList<Item> itemList = new ArrayList<>();
+    private AdapterListViewWalletManager adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_manager);
         getWidgets();
+        myDB = new MyDatabase(this);
 
-        for (int i = 0; i < 5; i++) {
+        //itemList = myDB.getAllItemByDate(formatDate(Calendar.getInstance().getTime()));
 
-            Item item = new Item(i, 0, "Item" + i, "01-02-1992", 1000, i);
-            itemList.add(item);
-        }
+        itemList = myDB.getAllItem();
+        adapter = new AdapterListViewWalletManager(WalletManagerActivity.this,
+                R.layout.custom_listview_wallet_manager, itemList);
+        mListViewItem.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
 
-        mListViewItem.setAdapter(new AdapterListviewWalletManager(
-                WalletManagerActivity.this,
-                R.layout.custom_listview_wallet_manager,
-                itemList));
 
         mImageAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -64,6 +73,38 @@ public class WalletManagerActivity extends AppCompatActivity {
                 createDialogReport(month, 10, 14, 4);
             }
         });
+
+        mCalendar.setOnDateSelectedListener(new CalendarView.OnDateSelectedListener() {
+            @Override
+            public void onDateSelected(@NonNull Date date) {
+                itemList = myDB.getAllItemByDate(formatDate(date));
+                if (itemList.size()==0){
+                    Toast.makeText(WalletManagerActivity.this, "There are nothing to show!", Toast.LENGTH_SHORT).show();
+                } else {
+                    adapter.clear();
+                    adapter.addAll(itemList);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+        });
+    }
+
+
+
+    public void updateListView() {
+        itemList = myDB.getAllItem();
+        adapter.clear();
+        adapter.addAll(itemList);
+        mListViewItem.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+
+        if (itemList.size() > 0) {
+            mTextHide.setVisibility(View.GONE);
+            mListViewItem.setVisibility(View.VISIBLE);
+        } else {
+            mTextHide.setVisibility(View.VISIBLE);
+            mListViewItem.setVisibility(View.GONE);
+        }
     }
 
     public void createDialogReport(String month, int balance, int income, int expense) {
@@ -77,9 +118,9 @@ public class WalletManagerActivity extends AppCompatActivity {
         TextView balance_value = (TextView) dialog.findViewById(R.id.txt_value_balance_dialog);
         balance_value.setText(balance + ",000 VND");
         TextView income_value = (TextView) dialog.findViewById(R.id.txt_value_income_dialog);
-        income_value.setText(income+",000 VND ");
+        income_value.setText(income + ",000 VND ");
         TextView expense_value = (TextView) dialog.findViewById(R.id.txt_value_expense_dialog);
-        expense_value.setText(expense+",000 VND");
+        expense_value.setText(expense + ",000 VND");
 
         ImageView image_detail = (ImageView) dialog.findViewById(R.id.image_detail_dialog);
         image_detail.setOnClickListener(new View.OnClickListener() {
@@ -97,13 +138,17 @@ public class WalletManagerActivity extends AppCompatActivity {
     }
 
     public void getWidgets() {
+        mTextHide = (TextView) findViewById(R.id.txt_hide);
         mCalendar = (CalendarView) findViewById(R.id.calendar_view);
         mImageAddItem = (ImageView) findViewById(R.id.image_add);
         mListViewItem = (ListView) findViewById(R.id.list_view_item);
         mImageReport = (ImageView) findViewById(R.id.image_report);
         mListViewItem = (ListView) findViewById(R.id.list_view_item);
-        mImageDelete = (ImageView) findViewById(R.id.image_delete);
-        mImageEdit = (ImageView) findViewById(R.id.image_edit);
     }
+
+    public String formatDate(Date date) {
+        return new SimpleDateFormat("dd-MM-yyyy").format(date);
+    }
+
 
 }
