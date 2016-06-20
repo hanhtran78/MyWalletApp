@@ -31,8 +31,6 @@ public class WalletManagerActivity extends AppCompatActivity {
     private ImageView mImageReport;
     private TextView mTextHide;
 
-    private static final int EDIT_ITEM = 0;
-
     private MyDatabase myDB;
     private ArrayList<Item> itemList = new ArrayList<>();
     private AdapterListViewWalletManager adapter;
