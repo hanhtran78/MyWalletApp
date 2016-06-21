@@ -35,12 +35,13 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
     /* Keyboard*/
     private TextView mKey0, mKey1, mKey2, mKey3, mKey4, mKey5, mKey6,
-            mKey7, mKey8, mKey9, mKeyOK, mKeyComma;
+            mKey7, mKey8, mKey9, mKeyOK;
     private ImageView mKeyBackspace;
 
     private MyDatabase myDb;
     private boolean incomeClicked = true;
     private String valueInput = "";
+    private Item itemReceive;
 
 
     @Override
@@ -54,7 +55,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 //        if (myDb.insertCategory(new Category(0, "movie", "ic_movie")) &&
 //                myDb.insertCategory(new Category(1, "shop", "ic_shop")) &&
 //                myDb.insertCategory(new Category(2, "another", "ic_another"))) {
-//            Toast.makeText(this, "Create mock catagory OK!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(this, "Create mock category OK!", Toast.LENGTH_SHORT).show();
 //        } else Toast.makeText(this, "Create mock category FAIL!", Toast.LENGTH_SHORT).show();
 
 
@@ -67,15 +68,16 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mTitleToolbar.setText(title);
 
         if (title.equals("Edit")) {
-            Item item = (Item) bundle.getSerializable("object");
-            if (item.getTypeItem() == 0) {
+            itemReceive = (Item) bundle.getSerializable("object");
+            if (itemReceive.getTypeItem() == 0) {
                 incomeClicked = true;
                 setColorWhenIncomeOrExpensePress();
             }
-            mTextDate.setText(item.getDateItem());
-            mTextValue.setText(item.getValueItem() + "");
-            mEditNoteItem.setText(item.getNameItem());
-            mSpinnerCategory.setSelection(item.getIdCategoryItem());
+            valueInput = itemReceive.getValueItem() + "";
+            mTextDate.setText(itemReceive.getDateItem());
+            mTextValue.setText(handleString(valueInput));
+            mEditNoteItem.setText(itemReceive.getNameItem());
+            mSpinnerCategory.setSelection(itemReceive.getIdCategoryItem());
             showImageByName("ic_" + mSpinnerCategory.getSelectedItem().toString());
 
             Toast.makeText(ItemActivity.this, "Edit -- Update value for views", Toast.LENGTH_SHORT).show();
@@ -148,41 +150,86 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     public void onClick(View v) {
         // handle number button click
 
-        mTextValue.setText(null);
         if (v.getTag() != null && "number_button".equals(v.getTag())) {
-            valueInput += ((TextView) v).getText().toString();
-            if (valueInput.length() >= 7) {
-                mTextValue.setTextSize(25);
-                mTextValue.setPadding(0, 25, 0, 0);
-            } else if (valueInput.length() >= 12) {
-                mTextValue.setTextSize(20);
-                mTextValue.setPadding(0, 30, 0, 0);
+            if (((TextView) v).getText().toString().equals("0") && mTextValue.getText().equals("0")) {
+
+                mTextValue.setText("0");
+
+            } else if (valueInput.length() < 6) {
+                valueInput += ((TextView) v).getText().toString();
+            } else {
+                Toast.makeText(ItemActivity.this, "Value is very large! " + valueInput, Toast.LENGTH_SHORT).show();
             }
-            mTextValue.setText(valueInput);
+            mTextValue.setText(handleString(valueInput));
         }
         switch (v.getId()) {
             case R.id.key_backspace:
-                valueInput = mTextValue.getText().toString();
-                if (valueInput.length() > 0) {
+                if (valueInput.length() > 1) {
                     String newValue = new StringBuilder(valueInput)
                             .deleteCharAt(valueInput.length() - 1).toString();
-                    mTextValue.setText(newValue);
+                    valueInput = newValue;
+                    mTextValue.setText(handBackSpace(newValue));
+
+                } else if (valueInput.length() == 1) {
+                    valueInput = "";
+                    mTextValue.setText("0");
                 }
                 break;
             case R.id.key_ok:
                 if (mTitleToolbar.getText().equals("Edit")) {
-                    Bundle bundle = getIntent().getBundleExtra("data");
-                    Item item = (Item) bundle.getSerializable("object");
-                    updateItem(item);
-                } else {
+                    if (!valueInput.equals("")) {
+                        updateItem(itemReceive);
+                    } else {
+                        Toast.makeText(ItemActivity.this, "Yet input value of item", Toast.LENGTH_SHORT).show();
+                    }
+                } else if (!valueInput.equals("")) {
                     addNewItem();
+                    valueInput = "";
+                } else {
+                    Toast.makeText(ItemActivity.this, "Yet input value of item", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
     }
 
+    public String handleString(String str) {
+        String newString;
+        switch (str.length()) {
+            case 4:
+                newString = new StringBuilder(str).insert(1, ",").toString();
+                break;
+            case 5:
+                newString = new StringBuilder(str).insert(2, ",").toString();
+                break;
+            case 6:
+                newString = new StringBuilder(str).insert(3, ",").toString();
+                break;
+            default:
+                newString = str;
+                break;
+        }
+        return newString;
+    }
+
+    public String handBackSpace(String str) {
+        String newStr;
+        switch (str.length()) {
+            case 5:
+                newStr = new StringBuilder(str).insert(2, ",").toString();
+                break;
+            case 4:
+                newStr = new StringBuilder(str).insert(1, ",").toString();
+                break;
+            default:
+                newStr = str;
+                break;
+        }
+        return newStr;
+    }
+
     public void addNewItem() {
         int id = myDb.numberItem();
+        id += 2;
         int type = 0;
         if (!incomeClicked)
             type = 1;
@@ -190,11 +237,11 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         int value = Integer.parseInt(valueInput);
         String date = mTextDate.getText().toString();
         int categoryItem = mSpinnerCategory.getSelectedItemPosition();
-        if (myDb.insertItem(new Item(++id, type, note, date, value, categoryItem))) {
+        if (myDb.insertItem(new Item(id, type, note, date, value, categoryItem))) {
             Toast.makeText(ItemActivity.this, "Add new item success", Toast.LENGTH_SHORT).show();
             reInput();
         } else {
-            Toast.makeText(ItemActivity.this, "Update  fail", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ItemActivity.this, "Add new item fail", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -212,7 +259,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         if (!incomeClicked)
             type = 1;
         String note = mEditNoteItem.getText().toString();
-        int value = Integer.parseInt(mTextValue.getText().toString());
+        int value = Integer.parseInt(valueInput);
         String date = mTextDate.getText().toString();
         int categoryItem = 0;
         if (mSpinnerCategory.getSelectedItem().equals("shop")) {
@@ -227,14 +274,11 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         item.setIdCategoryItem(categoryItem);
         if (myDb.updateItem(item)) {
             Toast.makeText(ItemActivity.this, "Update success", Toast.LENGTH_SHORT).show();
-
-            mTextValue.setText("0");
-            mTextValue.setTextSize(50);
-            mTextValue.setPadding(0, 0, 0, 0);
-            mTextDate.setText(formatDate(Calendar.getInstance().getTime()));
-            mSpinnerCategory.setSelection(0);
+            getIntent();
+            setResult(RESULT_OK);
+            finish();
         } else {
-            Toast.makeText(ItemActivity.this, "Add new item  fail", Toast.LENGTH_SHORT).show();
+            Toast.makeText(ItemActivity.this, "Update  fail", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -264,7 +308,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mKey9 = (TextView) findViewById(R.id.key_9);
         mKeyOK = (TextView) findViewById(R.id.key_ok);
         mKeyBackspace = (ImageView) findViewById(R.id.key_backspace);
-        mKeyComma = (TextView) findViewById(R.id.key_comma);
+        //mKeyComma = (TextView) findViewById(R.id.key_comma);
     }
 
     public void click_button_keyboard() {
@@ -278,7 +322,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mKey7.setOnClickListener((View.OnClickListener) this);
         mKey8.setOnClickListener((View.OnClickListener) this);
         mKey9.setOnClickListener((View.OnClickListener) this);
-        mKeyComma.setOnClickListener((View.OnClickListener) this);
         mKeyOK.setOnClickListener((View.OnClickListener) this);
         mKeyBackspace.setOnClickListener((View.OnClickListener) this);
     }

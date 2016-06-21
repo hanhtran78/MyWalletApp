@@ -178,22 +178,48 @@ public class MyDatabase extends SQLiteOpenHelper {
 
     public ArrayList<Item> getAllItemByDate(String date) {
         ArrayList<Item> array_list = new ArrayList<>();
-
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from items where " + COL_DATE_ITEM + "=" + date, null);
+        Cursor res = db.rawQuery("select * from items", null);
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {
-            array_list.add(new Item(
-                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
-                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
-                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
-            );
+            if (res.getString(res.getColumnIndex(COL_DATE_ITEM)).equals(date)) {
+                array_list.add(new Item(
+                        res.getInt(res.getColumnIndex(COL_ID_ITEM)),
+                        res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
+                        res.getString(res.getColumnIndex(COL_NAME_ITEM)),
+                        res.getString(res.getColumnIndex(COL_DATE_ITEM)),
+                        res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+                        res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
+                );
+            }
             res.moveToNext();
         }
         return array_list;
+    }
+
+    public int[] getValueAllByMonth() {
+
+        int sumIncome = 0;
+        int sumExpense = 0;
+
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select  * from items", null);
+        res.moveToFirst();
+        while (res.isAfterLast() == false) {
+            if (res.getInt(res.getColumnIndex(COL_TYPE_ITEM)) == 0) {
+                sumIncome += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
+            } else {
+                sumExpense += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
+            }
+            res.moveToNext();
+        }
+        int[] values = new int[]{sumIncome, sumExpense};
+        return values;
+    }
+
+    public String getMonth(String date){
+        String[] times = date.split("/");
+        return times[1];
     }
 }

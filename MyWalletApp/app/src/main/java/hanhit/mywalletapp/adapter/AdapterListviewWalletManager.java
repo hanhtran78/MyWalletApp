@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,9 +14,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import hanhit.mywalletapp.ItemActivity;
 import hanhit.mywalletapp.R;
+import hanhit.mywalletapp.WalletManagerActivity;
 import hanhit.mywalletapp.database.MyDatabase;
 import hanhit.mywalletapp.model.Item;
 
@@ -26,8 +29,6 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
 
     private Activity mContext;
     private ArrayList<Item> itemList;
-    private static final int EDIT_ITEM = 0;
-
     private MyDatabase myDb;
 
     public AdapterListViewWalletManager(Activity context, int resource, ArrayList<Item> objects) {
@@ -62,7 +63,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
         final Item item = itemList.get(position);
         holder.txtNameItem.setText(item.getNameItem());
         holder.txtDateOfItem.setText(item.getDateItem());
-        holder.txtValueItem.setText(item.getValueItem() + ",000 VND");
+        holder.txtValueItem.setText(handleString(item.getValueItem()+"") + ",000 VND");
 
         if (item.getTypeItem() == 0) {
             holder.txtValueItem.setTextColor(mContext.getResources().getColor(R.color.color_income));
@@ -86,10 +87,9 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
                 bundle.putString("title", "Edit");
                 bundle.putSerializable("object", itemSelected);
                 intentEdit.putExtra("data", bundle);
-                mContext.startActivityForResult(intentEdit, EDIT_ITEM);
+                mContext.startActivityForResult(intentEdit, Activity.RESULT_OK);
             }
         });
-
 
         holder.image_delete.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -115,6 +115,8 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
                 return false;
             }
         });
+
+
         return view;
     }
 
@@ -134,5 +136,24 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
                 image_category_item.setImageResource(resId);
             }
         }
+    }
+
+    public String handleString(String str) {
+        String newString;
+        switch (str.length()) {
+            case 4:
+                newString = new StringBuilder(str).insert(1, ",").toString();
+                break;
+            case 5:
+                newString = new StringBuilder(str).insert(2, ",").toString();
+                break;
+            case 6:
+                newString = new StringBuilder(str).insert(3, ",").toString();
+                break;
+            default:
+                newString = str;
+                break;
+        }
+        return newString;
     }
 }

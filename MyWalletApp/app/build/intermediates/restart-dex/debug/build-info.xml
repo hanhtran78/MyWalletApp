@@ -4,38 +4,30 @@
     api-level="19"
     density="xhdpi"
     format="7"
-    timestamp="293847983017587"
-    token="852733729478167059"
-    verifier="COMPATIBLE" >
+    timestamp="372567500239058"
+    token="852733729478167059" >
 
     <task
         name="javac"
-        duration="102" />
+        duration="0" />
     <task
         name="instant-run-dex"
-        duration="445" />
+        duration="0" />
     <task
         name="instant-run-transform"
-        duration="69" />
+        duration="0" />
     <task
         name="verifier"
-        duration="5" />
+        duration="0" />
 
     <artifact
-        location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\reload-dex\debug\classes.dex"
-        type="RELOAD_DEX" />
+        location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\outputs\apk\app-debug.apk"
+        type="MAIN" />
 
-    <build timestamp="293785785797678" >
+    <build timestamp="372567500239058" >
         <artifact
             location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\outputs\apk\app-debug.apk"
             type="MAIN" />
-    </build>
-    <build
-        timestamp="293847983017587"
-        verifier="COMPATIBLE" >
-        <artifact
-            location="D:\Mywork\MyWalletApp\MyWalletApp\app\build\intermediates\reload-dex\debug\classes.dex"
-            type="RELOAD_DEX" />
     </build>
 
 </instant-run>

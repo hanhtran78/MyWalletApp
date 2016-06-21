@@ -30,8 +30,8 @@
                 android:layout_weight="1"
                 android:background="@drawable/border_text_view_income"
                 android:gravity="center"
-                android:textColor="@color/white"
                 android:text="INCOME"
+                android:textColor="@color/white"
                 android:textSize="30dp" />
 
             <TextView
@@ -49,15 +49,16 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_gravity="center|end"
-            android:paddingTop="10dp"
-            android:gravity="center_horizontal">
+            android:gravity="center_horizontal"
+            android:orientation="horizontal"
+            android:paddingTop="10dp">
 
             <TextView
                 android:id="@+id/txt_value_acti_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:textSize="50dp" />
@@ -66,6 +67,7 @@
                 android:id="@+id/txt_zero_acti_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:singleLine="true"
                 android:text=" ,000"
                 android:textSize="20dp" />
 
@@ -74,6 +76,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
+                android:singleLine="true"
                 android:text=" VND"
                 android:textSize="50dp" />
         </LinearLayout>
