@@ -30,7 +30,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTextIncome, mTextExpense, mTextValue, mTextZero,
             mTextVND, mTextDate;
     private EditText mEditNoteItem;
-    private ImageView mImageDate, mImageCategory;
+    private ImageView mImageDate, mImageCategory, mChoiseCategory;
     private Spinner mSpinnerCategory;
 
     /* Keyboard*/
@@ -42,6 +42,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     private boolean incomeClicked = true;
     private String valueInput = "";
     private Item itemReceive;
+    private MyHandle myHandle;
 
 
     @Override
@@ -50,13 +51,16 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_item);
         getWidgets();
         myDb = new MyDatabase(this);
+        myHandle = new MyHandle();
 
         // create mock data for category
-//        if (myDb.insertCategory(new Category(0, "movie", "ic_movie")) &&
-//                myDb.insertCategory(new Category(1, "shop", "ic_shop")) &&
-//                myDb.insertCategory(new Category(2, "another", "ic_another"))) {
-//            Toast.makeText(this, "Create mock category OK!", Toast.LENGTH_SHORT).show();
-//        } else Toast.makeText(this, "Create mock category FAIL!", Toast.LENGTH_SHORT).show();
+        if (myDb.getAllNameCategory().size() > 0) {
+
+        } else {
+            myDb.insertCategory(new Category(0, "movie", "ic_movie"));
+            myDb.insertCategory(new Category(1, "shop", "ic_shop"));
+            myDb.insertCategory(new Category(2, "another", "ic_another"));
+        }
 
 
         initSpinner();
@@ -71,20 +75,24 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             itemReceive = (Item) bundle.getSerializable("object");
             if (itemReceive.getTypeItem() == 0) {
                 incomeClicked = true;
-                setColorWhenIncomeOrExpensePress();
+            } else {
+                incomeClicked = false;
             }
+            setColorWhenIncomeOrExpensePress();
+
             valueInput = itemReceive.getValueItem() + "";
             mTextDate.setText(itemReceive.getDateItem());
-            mTextValue.setText(handleString(valueInput));
+
+            mTextValue.setText(myHandle.handleString(valueInput));
             mEditNoteItem.setText(itemReceive.getNameItem());
             mSpinnerCategory.setSelection(itemReceive.getIdCategoryItem());
             showImageByName("ic_" + mSpinnerCategory.getSelectedItem().toString());
 
-            Toast.makeText(ItemActivity.this, "Edit -- Update value for views", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(ItemActivity.this, "Edit -- Update value for views", Toast.LENGTH_SHORT).show();
         } else {
             Calendar calendar = Calendar.getInstance();
             // Set current date for item
-            mTextDate.setText(formatDate(calendar.getTime()));
+            mTextDate.setText(myHandle.formatDate(calendar.getTime()));
             showImageByName("ic_" + mSpinnerCategory.getSelectedItem().toString());
         }
 
@@ -121,12 +129,19 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
                         int month = monthOfYear + 1;
                         String monthStr = month + "";
                         if (month < 10)
-                            monthStr = "0" + monthOfYear;
+                            monthStr = "0" + month;
 
                         mTextDate.setText(dayStr + "-" + monthStr + "-" + year);
                     }
                 }, calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
                 date_picker.show();
+            }
+        });
+
+        mChoiseCategory.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mSpinnerCategory.performClick();
             }
         });
 
@@ -142,7 +157,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
             }
         });
-
 
     }
 
@@ -160,7 +174,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 Toast.makeText(ItemActivity.this, "Value is very large! " + valueInput, Toast.LENGTH_SHORT).show();
             }
-            mTextValue.setText(handleString(valueInput));
+            mTextValue.setText(myHandle.handleString(valueInput));
         }
         switch (v.getId()) {
             case R.id.key_backspace:
@@ -168,7 +182,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
                     String newValue = new StringBuilder(valueInput)
                             .deleteCharAt(valueInput.length() - 1).toString();
                     valueInput = newValue;
-                    mTextValue.setText(handBackSpace(newValue));
+                    mTextValue.setText(myHandle.handBackSpace(newValue));
 
                 } else if (valueInput.length() == 1) {
                     valueInput = "";
@@ -190,41 +204,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 break;
         }
-    }
-
-    public String handleString(String str) {
-        String newString;
-        switch (str.length()) {
-            case 4:
-                newString = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            case 5:
-                newString = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 6:
-                newString = new StringBuilder(str).insert(3, ",").toString();
-                break;
-            default:
-                newString = str;
-                break;
-        }
-        return newString;
-    }
-
-    public String handBackSpace(String str) {
-        String newStr;
-        switch (str.length()) {
-            case 5:
-                newStr = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 4:
-                newStr = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            default:
-                newStr = str;
-                break;
-        }
-        return newStr;
     }
 
     public void addNewItem() {
@@ -250,7 +229,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mTextValue.setTextSize(50);
         mTextValue.setPadding(0, 0, 0, 0);
         mEditNoteItem.setText(null);
-        mTextDate.setText(formatDate(Calendar.getInstance().getTime()));
+        mTextDate.setText(myHandle.formatDate(Calendar.getInstance().getTime()));
         mSpinnerCategory.setSelection(0);
     }
 
@@ -295,6 +274,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mEditNoteItem = (EditText) findViewById(R.id.edit_note_acti_item);
         mImageDate = (ImageView) findViewById(R.id.image_date_acti_item);
         mImageCategory = (ImageView) findViewById(R.id.image_category_acti_item);
+        mChoiseCategory = (ImageView) findViewById(R.id.image_choise_category_acti_item);
 
         mKey0 = (TextView) findViewById(R.id.key_0);
         mKey1 = (TextView) findViewById(R.id.key_1);
@@ -308,7 +288,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mKey9 = (TextView) findViewById(R.id.key_9);
         mKeyOK = (TextView) findViewById(R.id.key_ok);
         mKeyBackspace = (ImageView) findViewById(R.id.key_backspace);
-        //mKeyComma = (TextView) findViewById(R.id.key_comma);
     }
 
     public void click_button_keyboard() {
@@ -324,11 +303,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mKey9.setOnClickListener((View.OnClickListener) this);
         mKeyOK.setOnClickListener((View.OnClickListener) this);
         mKeyBackspace.setOnClickListener((View.OnClickListener) this);
-    }
-
-    // Method format date
-    public String formatDate(Date date) {
-        return new SimpleDateFormat("dd-MM-yyyy").format(date);
     }
 
     public void setColorWhenIncomeOrExpensePress() {
@@ -358,7 +332,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     public void initSpinner() {
         mSpinnerCategory = (Spinner) findViewById(R.id.spinner_category);
 
-        ArrayList<String> categories = myDb.getAllCategory();
+        ArrayList<String> categories = myDb.getAllNameCategory();
         ArrayAdapter<String> dataAdapter = new ArrayAdapter<>(this,
                 android.R.layout.simple_spinner_item, categories);
         dataAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);

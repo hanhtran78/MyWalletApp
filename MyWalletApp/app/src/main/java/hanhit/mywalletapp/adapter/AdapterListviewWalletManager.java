@@ -106,7 +106,6 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
             }
         });
 
-
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {

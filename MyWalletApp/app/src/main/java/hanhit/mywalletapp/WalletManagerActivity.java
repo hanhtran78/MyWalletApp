@@ -35,8 +35,7 @@ public class WalletManagerActivity extends AppCompatActivity {
     private MyDatabase myDB;
     private ArrayList<Item> itemList = new ArrayList<>();
     private AdapterListViewWalletManager adapter;
-
-    private Handler mTimeHandle;
+    private MyHandle myHandle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,8 +43,9 @@ public class WalletManagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_wallet_manager);
         getWidgets();
         myDB = new MyDatabase(this);
+        myHandle = new MyHandle();
 
-        itemList = myDB.getAllItemByDate(formatDate(Calendar.getInstance().getTime()));
+        itemList = myDB.getAllItemByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
         adapter = new AdapterListViewWalletManager(WalletManagerActivity.this,
                 R.layout.custom_listview_wallet_manager, itemList);
         mListViewItem.setAdapter(adapter);
@@ -68,7 +68,7 @@ public class WalletManagerActivity extends AppCompatActivity {
                 // get value balance, income, expense from data
                 // Show Dialog Report Of Month
                 String month = mCalendar.getCurrentMonth();
-                int[] sumValues = myDB.getValueAllByMonth();
+                int[] sumValues = myDB.getValueAllByMonth(myHandle.convertMonthTypeStringToNum(month));
                 int income = sumValues[0];
                 int expense = sumValues[1];
                 createDialogReport(month, income - expense, income, expense);
@@ -80,7 +80,7 @@ public class WalletManagerActivity extends AppCompatActivity {
         mCalendar.setOnDateSelectedListener(new CalendarView.OnDateSelectedListener() {
             @Override
             public void onDateSelected(@NonNull Date date) {
-                loadDataByDate(formatDate(date));
+                loadDataByDate(myHandle.formatDate(date));
             }
         });
 
@@ -89,7 +89,7 @@ public class WalletManagerActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == RESULT_OK && resultCode == RESULT_OK) {
-            loadDataByDate(formatDate(Calendar.getInstance().getTime()));
+            loadDataByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
         } else {
             Toast.makeText(WalletManagerActivity.this, "Cancel update!", Toast.LENGTH_SHORT).show();
         }
@@ -98,7 +98,7 @@ public class WalletManagerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadDataByDate(formatDate(Calendar.getInstance().getTime()));
+        loadDataByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
         Toast.makeText(WalletManagerActivity.this, "Count number item: " + myDB.numberItem(), Toast.LENGTH_LONG).show();
     }
 
@@ -128,13 +128,13 @@ public class WalletManagerActivity extends AppCompatActivity {
         title_dialog.setText("Summary for " + month);
 
         TextView balance_value = (TextView) dialog.findViewById(R.id.txt_value_balance_dialog);
-        balance_value.setText(handleString(balance + "") + ",000 VND");
+        balance_value.setText(myHandle.handleString(balance + "") + ",000 VND");
 
         TextView income_value = (TextView) dialog.findViewById(R.id.txt_value_income_dialog);
-        income_value.setText(handleString(income + "") + ",000 VND ");
+        income_value.setText(myHandle.handleString(income + "") + ",000 VND ");
 
         TextView expense_value = (TextView) dialog.findViewById(R.id.txt_value_expense_dialog);
-        expense_value.setText(handleString(expense + "") + ",000 VND ");
+        expense_value.setText(myHandle.handleString(expense + "") + ",000 VND ");
 
         ImageView image_detail = (ImageView) dialog.findViewById(R.id.image_detail_dialog);
         image_detail.setOnClickListener(new View.OnClickListener() {
@@ -143,6 +143,7 @@ public class WalletManagerActivity extends AppCompatActivity {
                 Intent intentReportDetail = new Intent(WalletManagerActivity.this, ReportDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("title", title_dialog.getText().toString());
+                bundle.putString("month", mCalendar.getCurrentMonth());
                 intentReportDetail.putExtra("data", bundle);
                 startActivity(intentReportDetail);
                 dialog.dismiss();
@@ -160,66 +161,9 @@ public class WalletManagerActivity extends AppCompatActivity {
         mListViewItem = (ListView) findViewById(R.id.list_view_item);
     }
 
-    public String formatDate(Date date) {
-        return new SimpleDateFormat("dd-MM-yyyy").format(date);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myDB.close();
     }
-
-    public String handleString(String str) {
-        String newString;
-        switch (str.length()) {
-            case 4:
-                newString = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            case 5:
-                newString = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 6:
-                newString = new StringBuilder(str).insert(3, ",").toString();
-                break;
-            case 7:
-                newString = new StringBuilder(str).insert(1, ",").insert(5, ",").toString();
-                break;
-            case 8:
-                newString = new StringBuilder(str).insert(2, ",").insert(6, ",").toString();
-                break;
-            case 9:
-                newString = new StringBuilder(str).insert(3, ",").insert(7, ",").toString();
-                break;
-            default:
-                newString = str;
-                break;
-        }
-        return newString;
-    }
-
-    public String convertMonthTypeStringToNum(String month){
-        switch (month){
-            case "JANUARY":
-                return "01";
-            case "FEBRUARY":
-                return "02";
-            case "MARCH":
-                return "03";
-            case "APRIL":
-                return "04";
-            case "MAY":
-                return "05";
-            case "JUNE":
-                return "06";
-            case "JULY0":
-                return "07";
-            case "AUGUST":
-                return "08";
-            case "SEPTEMBER":
-                return "09";
-            case "OCTOBER":
-                return "10";
-            case "NOVEMBER":
-                return "11";
-            default:
-                return "12";
-        }
-    }
-
-
 }

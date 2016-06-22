@@ -44,6 +44,7 @@ public class AdapterGridViewLogin extends BaseAdapter {
         return view;
     }
 
+
     @Override
     public int getCount() {
         return strView.length;

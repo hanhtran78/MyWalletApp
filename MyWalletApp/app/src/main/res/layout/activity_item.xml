@@ -15,10 +15,12 @@
         android:paddingBottom="8dp"
         android:paddingLeft="8dp"
         android:paddingRight="8dp"
+        android:weightSum="10"
         android:paddingTop="8dp">
 
         <LinearLayout
             android:layout_width="match_parent"
+            android:layout_weight="1.2"
             android:layout_height="60dp"
             android:background="@drawable/border_text_view_normal"
             android:gravity="center">
@@ -48,8 +50,9 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center|end"
+            android:layout_weight="1.2"
             android:gravity="center_horizontal"
             android:orientation="horizontal"
             android:paddingTop="10dp">
@@ -61,7 +64,8 @@
                 android:singleLine="true"
                 android:text="0"
                 android:textAppearance="?android:attr/textAppearanceLarge"
-                android:textSize="50dp" />
+                android:textSize="40dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txt_zero_acti_item"
@@ -69,7 +73,8 @@
                 android:layout_height="wrap_content"
                 android:singleLine="true"
                 android:text=" ,000"
-                android:textSize="20dp" />
+                android:textSize="20dp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/txt_vnd_acti_item"
@@ -78,13 +83,15 @@
                 android:layout_gravity="center"
                 android:singleLine="true"
                 android:text=" VND"
-                android:textSize="50dp" />
+                android:textSize="40dp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
+            android:layout_weight="1.2"
             android:paddingTop="10dp"
             android:weightSum="4">
 
@@ -109,12 +116,13 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:orientation="horizontal"
             android:paddingBottom="10dp"
+            android:layout_weight="1.2"
             android:paddingTop="10dp"
             android:stretchColumns="*"
-            android:weightSum="4">
+            android:weightSum="10">
 
 
             <TextView
@@ -129,16 +137,15 @@
                 android:id="@+id/txt_date_acti_item"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="2.8"
+                android:layout_weight="9.2"
                 android:paddingLeft="10dp" />
 
             <ImageView
                 android:id="@+id/image_date_acti_item"
-                android:layout_width="50dp"
-                android:layout_height="40dp"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
                 android:layout_gravity="center_vertical"
-                android:layout_weight="0.4"
-                android:gravity="right"
+                android:gravity="end"
                 android:src="@mipmap/ic_date_picker" />
 
         </LinearLayout>
@@ -147,6 +154,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
+            android:layout_weight="1.2"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:weightSum="10">
@@ -167,7 +175,6 @@
                 android:layout_height="30dp"
                 android:layout_gravity="center"
                 android:layout_marginRight="10dp"
-                android:layout_weight="1"
                 android:src="@mipmap/ic_category" />
 
             <Spinner
@@ -178,11 +185,23 @@
                 android:layout_weight="9"
                 android:background="@drawable/border_spinner"
                 android:gravity="center" />
+
+            <ImageView
+                android:id="@+id/image_choise_category_acti_item"
+                android:layout_width="40dp"
+                android:layout_height="30dp"
+                android:layout_gravity="center|end"
+                android:layout_weight="1"
+                android:paddingRight="5dp"
+                android:src="@mipmap/ic_category_picker" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_weight="4"
+            android:layout_gravity="center_horizontal"
+            android:gravity="center_horizontal"
+            android:layout_height="match_parent">
 
             <include layout="@layout/custom_keyboard" />
         </LinearLayout>
