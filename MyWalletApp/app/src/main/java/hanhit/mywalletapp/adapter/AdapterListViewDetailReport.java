@@ -2,7 +2,6 @@ package hanhit.mywalletapp.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,7 +9,6 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import hanhit.mywalletapp.MyHandle;
@@ -26,22 +24,15 @@ public class AdapterListViewDetailReport extends BaseAdapter {
     private Activity mContext;
     private List objects;
     private MyHandle myHandle;
-    private MyDatabase myDb;
 
     public AdapterListViewDetailReport(Activity mContext, List objects) {
         this.mContext = mContext;
         this.objects = objects;
     }
 
-    public String getMonth(String date) {
-        String[] times = date.split("-");
-        return times[1];
-    }
-
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         myHandle = new MyHandle();
-        myDb = new MyDatabase(mContext);
 
         View view = convertView;
         LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -49,7 +40,7 @@ public class AdapterListViewDetailReport extends BaseAdapter {
         if (view == null) {
             try {
                 Category category = (Category) objects.get(position);
-                view = inflater.inflate(R.layout.custom_category_detail_report, null);
+                view = inflater.inflate(R.layout.custom_report_category, null);
 
                 ImageView image = (ImageView) view.findViewById(R.id.image_category_report);
                 int id_image = mContext.getResources().getIdentifier(category.getNameIconCategory(), "mipmap", mContext.getPackageName());
@@ -61,19 +52,18 @@ public class AdapterListViewDetailReport extends BaseAdapter {
 
                 TextView value_category = (TextView) view.findViewById(R.id.txt_value_category_report);
 
-                //test for month 6
-                int valueInt = myDb.getValueAllItemByCategoryAndMonth("06", category.getIdCategory());
-                if (valueInt > 0) {
+                int valueInt = getValueAllItemByCategory(category.getIdCategory());
+                if (valueInt >= 0) {
                     value_category.setTextColor(mContext.getResources().getColor(R.color.color_income));
                 } else {
                     value_category.setTextColor(mContext.getResources().getColor(R.color.color_expense));
                 }
                 String valueStr = myHandle.handleString(valueInt + "");
-                value_category.setText(valueStr + ", 000 VND");
+                value_category.setText(valueStr + ",000 VND");
 
             } catch (ClassCastException e) {
                 Item item = (Item) objects.get(position);
-                view = inflater.inflate(R.layout.custom_item_detail_report, null);
+                view = inflater.inflate(R.layout.custom_report_item, null);
 
                 TextView txt_name_item = (TextView) view.findViewById(R.id.txt_name_item_report);
                 txt_name_item.setText(item.getNameItem());
@@ -108,5 +98,23 @@ public class AdapterListViewDetailReport extends BaseAdapter {
     @Override
     public long getItemId(int position) {
         return 0;
+    }
+
+    public int getValueAllItemByCategory(int id_cate) {
+        int sumIncome = 0;
+        int sumExpense = 0;
+        for (int i = 0; i < objects.size(); i++) {
+            try {
+                Item item = (Item) objects.get(i);
+                if (item.getIdCategoryItem() == id_cate) {
+                    if (item.getTypeItem() == 0) {
+                        sumIncome += item.getValueItem();
+                    } else {
+                        sumExpense += item.getValueItem();
+                    }
+                }
+            } catch (ClassCastException ex) {}
+        }
+        return (sumIncome - sumExpense);
     }
 }

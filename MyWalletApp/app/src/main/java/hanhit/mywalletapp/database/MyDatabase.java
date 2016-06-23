@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import java.util.ArrayList;
 import java.util.List;
 
+import hanhit.mywalletapp.MyHandle;
 import hanhit.mywalletapp.model.Category;
 import hanhit.mywalletapp.model.Item;
 
@@ -17,6 +18,8 @@ import hanhit.mywalletapp.model.Item;
  * Created by hanh.tran on 6/17/2016.
  */
 public class MyDatabase extends SQLiteOpenHelper {
+
+    private MyHandle myHandle = new MyHandle();
 
     // Table Items
     public static final String TABLE_ITEMS = "items";
@@ -68,18 +71,18 @@ public class MyDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public Item getItem(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from items where idItem = " + id + "", null);
-        Item item = new Item(
-                res.getInt(res.getColumnIndex(COL_ID_ITEM)),
-                res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
-                res.getString(res.getColumnIndex(COL_NAME_ITEM)),
-                res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
-                res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)));
-        return item;
-    }
+//    public Item getItem(int id) {
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor res = db.rawQuery("select * from items where idItem = " + id + "", null);
+//        Item item = new Item(
+//                res.getInt(res.getColumnIndex(COL_ID_ITEM)),
+//                res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
+//                res.getString(res.getColumnIndex(COL_NAME_ITEM)),
+//                res.getString(res.getColumnIndex(COL_DATE_ITEM)),
+//                res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+//                res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)));
+//        return item;
+//    }
 
     public Category getCategory(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -174,26 +177,26 @@ public class MyDatabase extends SQLiteOpenHelper {
         return db.delete(TABLE_ITEMS, COL_ID_ITEM + " = " + id, null);
     }
 
-    public ArrayList<Item> getAllItem() {
-        ArrayList<Item> array_list = new ArrayList<>();
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from items", null);
-        res.moveToFirst();
-
-        while (res.isAfterLast() == false) {
-            array_list.add(new Item(
-                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
-                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
-                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
-                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
-            );
-            res.moveToNext();
-        }
-        return array_list;
-    }
+//    public ArrayList<Item> getAllItem() {
+//        ArrayList<Item> array_list = new ArrayList<>();
+//
+//        SQLiteDatabase db = this.getReadableDatabase();
+//        Cursor res = db.rawQuery("select * from items", null);
+//        res.moveToFirst();
+//
+//        while (res.isAfterLast() == false) {
+//            array_list.add(new Item(
+//                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
+//                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
+//                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
+//                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
+//                    res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+//                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
+//            );
+//            res.moveToNext();
+//        }
+//        return array_list;
+//    }
 
     public ArrayList<Item> getAllItemByDate(String date) {
         ArrayList<Item> array_list = new ArrayList<>();
@@ -224,7 +227,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {
-            if (getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
+            if (myHandle.getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
                 array_list.add(new Item(
                         res.getInt(res.getColumnIndex(COL_ID_ITEM)),
                         res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
@@ -246,7 +249,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {
-            if (getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month) &&
+            if (myHandle.getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month) &&
                     res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)) == id) {
                 array_list.add(new Item(
                         res.getInt(res.getColumnIndex(COL_ID_ITEM)),
@@ -263,7 +266,6 @@ public class MyDatabase extends SQLiteOpenHelper {
     }
 
     public int[] getValueAllByMonth(String month) {
-
         int sumIncome = 0;
         int sumExpense = 0;
 
@@ -272,7 +274,7 @@ public class MyDatabase extends SQLiteOpenHelper {
         res.moveToFirst();
 
         while (res.isAfterLast() == false) {
-            if (getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
+            if (myHandle.getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
                 if (res.getInt(res.getColumnIndex(COL_TYPE_ITEM)) == 0) {
                     sumIncome += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
                 } else {
@@ -284,35 +286,6 @@ public class MyDatabase extends SQLiteOpenHelper {
         int[] values = new int[]{sumIncome, sumExpense};
         return values;
     }
-
-    public int getValueAllItemByCategoryAndMonth(String month, int idCategory) {
-
-        int sumIncome = 0;
-        int sumExpense = 0;
-
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select  * from items where " + COL_CATEGORY_ID_ITEM + "=" + idCategory + "", null);
-        res.moveToFirst();
-        while (res.isAfterLast() == false) {
-            if (getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
-                sumIncome += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
-            } else {
-                sumExpense += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
-            }
-            res.moveToNext();
-        }
-        int value = (sumIncome - sumExpense);
-        return value;
-    }
-
-//    public String[] getNameCategoryByIdCategory(int id) {
-//        Cursor res = this.getReadableDatabase().rawQuery(
-//                "select " + COL_NAME_CATEGORY + "," + COL_NAME_IMAGE + " from categories where " + COL_ID_CATEGORY + "=" + id, null);
-//        String nameCategory = res.getString(res.getColumnIndex(COL_NAME_CATEGORY));
-//        String nameIcon = res.getString(res.getColumnIndex(COL_NAME_IMAGE));
-//        String[] strings = new String[]{nameCategory, nameIcon};
-//        return strings;
-//    }
 
     public List getObjectByMonth(String month) {
         List objects = new ArrayList();
@@ -330,10 +303,5 @@ public class MyDatabase extends SQLiteOpenHelper {
         }
 
         return objects;
-    }
-
-    public String getMonth(String date) {
-        String[] times = date.split("-");
-        return times[1];
     }
 }

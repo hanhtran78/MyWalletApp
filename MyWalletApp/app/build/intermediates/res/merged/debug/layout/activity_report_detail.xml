@@ -11,7 +11,7 @@
 
     <ListView
         android:id="@+id/list_view_detail_report"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="center_horizontal"
         android:paddingBottom="5dp" />

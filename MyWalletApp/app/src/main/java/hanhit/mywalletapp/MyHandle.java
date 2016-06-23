@@ -8,10 +8,16 @@ import java.util.Date;
  */
 public class MyHandle {
 
-    public MyHandle() {}
+    public MyHandle() {
+    }
 
     public String handleString(String str) {
         String newString;
+        boolean sub = false;
+        if (str.contains("-")) {
+            sub = true;
+            str = str.replace("-", "");
+        }
         switch (str.length()) {
             case 4:
                 newString = new StringBuilder(str).insert(1, ",").toString();
@@ -35,12 +41,24 @@ public class MyHandle {
                 newString = str;
                 break;
         }
+        if (sub) {
+            newString = new StringBuilder(newString).insert(0, "-").toString();
+        }
         return newString;
     }
 
     public String handBackSpace(String str) {
         String newStr;
         switch (str.length()) {
+            case 8:
+                newStr = new StringBuilder(str).insert(2,",").insert(6,",").toString();
+                break;
+            case 7:
+                newStr = new StringBuilder(str).insert(1,",").insert(5,",").toString();
+                break;
+            case 6:
+                newStr = new StringBuilder(str).insert(3,",").toString();
+                break;
             case 5:
                 newStr = new StringBuilder(str).insert(2, ",").toString();
                 break;
@@ -59,33 +77,38 @@ public class MyHandle {
         return new SimpleDateFormat("dd-MM-yyyy").format(date);
     }
 
-    public String convertMonthTypeStringToNum(String month){
-        switch (month){
-            case "JANUARY":
-                return "01";
-            case "FEBRUARY":
-                return "02";
-            case "MARCH":
-                return "03";
-            case "APRIL":
-                return "04";
-            case "MAY":
-                return "05";
-            case "JUNE":
-                return "06";
-            case "JULY":
-                return "07";
-            case "AUGUST":
-                return "08";
-            case "SEPTEMBER":
-                return "09";
-            case "OCTOBER":
-                return "10";
-            case "NOVEMBER":
-                return "11";
-            default:
-                return "12";
-        }
+//    public String convertMonthTypeStringToNum(String month) {
+//        switch (month) {
+//            case "JANUARY":
+//                return "01";
+//            case "FEBRUARY":
+//                return "02";
+//            case "MARCH":
+//                return "03";
+//            case "APRIL":
+//                return "04";
+//            case "MAY":
+//                return "05";
+//            case "JUNE":
+//                return "06";
+//            case "JULY":
+//                return "07";
+//            case "AUGUST":
+//                return "08";
+//            case "SEPTEMBER":
+//                return "09";
+//            case "OCTOBER":
+//                return "10";
+//            case "NOVEMBER":
+//                return "11";
+//            default:
+//                return "12";
+//        }
+//    }
+
+    public String getMonth(String date) {
+        String[] times = date.split("-");
+        return times[1];
     }
 
 }

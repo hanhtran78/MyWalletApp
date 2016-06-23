@@ -27,10 +27,6 @@ public class Item implements Serializable{
         return idItem;
     }
 
-    public void setIdItem(int idItem) {
-        this.idItem = idItem;
-    }
-
     public int getTypeItem() {
         return typeItem;
     }
@@ -69,5 +65,9 @@ public class Item implements Serializable{
 
     public void setIdCategoryItem(int idCategoryItem) {
         this.idCategoryItem = idCategoryItem;
+    }
+
+    public boolean isItem(){
+        return true;
     }
 }

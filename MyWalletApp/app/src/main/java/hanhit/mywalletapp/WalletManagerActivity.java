@@ -1,5 +1,6 @@
 package hanhit.mywalletapp;
 
+import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Handler;
@@ -8,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -26,6 +29,8 @@ import hanhit.mywalletapp.model.Item;
 
 public class WalletManagerActivity extends AppCompatActivity {
 
+    private String LOG_TAG = this.getClass().getSimpleName();
+
     private CalendarView mCalendar;
     private ImageView mImageAddItem;
     private ListView mListViewItem;
@@ -36,6 +41,7 @@ public class WalletManagerActivity extends AppCompatActivity {
     private ArrayList<Item> itemList = new ArrayList<>();
     private AdapterListViewWalletManager adapter;
     private MyHandle myHandle;
+    private static String currentMonthOfCalendar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +50,7 @@ public class WalletManagerActivity extends AppCompatActivity {
         getWidgets();
         myDB = new MyDatabase(this);
         myHandle = new MyHandle();
+        currentMonthOfCalendar = myHandle.getMonth(myHandle.formatDate(Calendar.getInstance().getTime()));
 
         itemList = myDB.getAllItemByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
         adapter = new AdapterListViewWalletManager(WalletManagerActivity.this,
@@ -54,11 +61,17 @@ public class WalletManagerActivity extends AppCompatActivity {
         mImageAddItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
                 Intent startAddItemActivity = new Intent(WalletManagerActivity.this, ItemActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("title", "Add New");
                 startAddItemActivity.putExtra("data", bundle);
                 startActivity(startAddItemActivity);
+                overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
+
+//                Animation mLoadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in);
+//                mLoadAnimation.setDuration(7000);
+//                mImageAddItem.startAnimation(mLoadAnimation);
             }
         });
 
@@ -67,13 +80,15 @@ public class WalletManagerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // get value balance, income, expense from data
                 // Show Dialog Report Of Month
-                String month = mCalendar.getCurrentMonth();
-                int[] sumValues = myDB.getValueAllByMonth(myHandle.convertMonthTypeStringToNum(month));
+                int[] sumValues = myDB.getValueAllByMonth(currentMonthOfCalendar);
                 int income = sumValues[0];
                 int expense = sumValues[1];
-                createDialogReport(month, income - expense, income, expense);
-
-                Toast.makeText(WalletManagerActivity.this, mCalendar.getCurrentMonth() + "", Toast.LENGTH_SHORT).show();
+                String month = mCalendar.getCurrentMonth();
+                if (income == expense && income == 0) {
+                    Toast.makeText(WalletManagerActivity.this, "The " + month + " no have data to show!", Toast.LENGTH_SHORT).show();
+                } else {
+                    createDialogReport(month, income - expense, income, expense);
+                }
             }
         });
 
@@ -81,9 +96,18 @@ public class WalletManagerActivity extends AppCompatActivity {
             @Override
             public void onDateSelected(@NonNull Date date) {
                 loadDataByDate(myHandle.formatDate(date));
+                currentMonthOfCalendar = myHandle.getMonth(myHandle.formatDate(date));
             }
         });
 
+        mCalendar.setOnMonthChangedListener(new CalendarView.OnMonthChangedListener() {
+            @Override
+            public void onMonthChanged(@NonNull Date date) {
+                currentMonthOfCalendar = myHandle.getMonth(myHandle.formatDate(date));
+                itemList = myDB.getAllItemByMonth(currentMonthOfCalendar);
+                updateListViewWalletManager();
+            }
+        });
     }
 
     @Override
@@ -99,12 +123,15 @@ public class WalletManagerActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         loadDataByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
-        Toast.makeText(WalletManagerActivity.this, "Count number item: " + myDB.numberItem(), Toast.LENGTH_LONG).show();
+//        Toast.makeText(WalletManagerActivity.this, "Count number item: " + myDB.numberItem(), Toast.LENGTH_LONG).show();
     }
 
     public void loadDataByDate(String date) {
         itemList = myDB.getAllItemByDate(date);
+        updateListViewWalletManager();
+    }
 
+    public void updateListViewWalletManager() {
         if (itemList.size() > 0) {
             adapter.clear();
             adapter.addAll(itemList);
@@ -118,14 +145,18 @@ public class WalletManagerActivity extends AppCompatActivity {
         }
     }
 
-    public void createDialogReport(String month, int balance, int income, int expense) {
+    public void createDialogReport(final String month, int balance, int income, int expense) {
         final Dialog dialog = new Dialog(WalletManagerActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.custom_dialog_content_report);
 
         // get and set value for widgets of dialog
         final TextView title_dialog = (TextView) dialog.findViewById(R.id.toolbar_title_dialog);
-        title_dialog.setText("Summary for " + month);
+        String title = "Summary for " + month;
+        if (title.length() > 16) {
+            title_dialog.setTextSize(20);
+        }
+        title_dialog.setText(title);
 
         TextView balance_value = (TextView) dialog.findViewById(R.id.txt_value_balance_dialog);
         balance_value.setText(myHandle.handleString(balance + "") + ",000 VND");
@@ -143,7 +174,7 @@ public class WalletManagerActivity extends AppCompatActivity {
                 Intent intentReportDetail = new Intent(WalletManagerActivity.this, ReportDetailActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putString("title", title_dialog.getText().toString());
-                bundle.putString("month", mCalendar.getCurrentMonth());
+                bundle.putString("month", currentMonthOfCalendar);
                 intentReportDetail.putExtra("data", bundle);
                 startActivity(intentReportDetail);
                 dialog.dismiss();

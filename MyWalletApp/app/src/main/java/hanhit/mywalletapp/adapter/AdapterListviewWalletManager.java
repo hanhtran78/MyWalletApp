@@ -1,10 +1,13 @@
 package hanhit.mywalletapp.adapter;
 
 import android.app.Activity;
+import android.app.ActivityOptions;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import hanhit.mywalletapp.ItemActivity;
+import hanhit.mywalletapp.MyHandle;
 import hanhit.mywalletapp.R;
 import hanhit.mywalletapp.WalletManagerActivity;
 import hanhit.mywalletapp.database.MyDatabase;
@@ -30,6 +34,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
     private Activity mContext;
     private ArrayList<Item> itemList;
     private MyDatabase myDb;
+    private MyHandle myHandle;
 
     public AdapterListViewWalletManager(Activity context, int resource, ArrayList<Item> objects) {
         super(context, resource, objects);
@@ -44,6 +49,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
         final ViewHolderItem holder;
         View view = convertView;
         if (view == null) {
+            myHandle = new MyHandle();
             LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             view = inflater.inflate(R.layout.custom_listview_wallet_manager, null);
             holder = new ViewHolderItem();
@@ -63,7 +69,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
         final Item item = itemList.get(position);
         holder.txtNameItem.setText(item.getNameItem());
         holder.txtDateOfItem.setText(item.getDateItem());
-        holder.txtValueItem.setText(handleString(item.getValueItem()+"") + ",000 VND");
+        holder.txtValueItem.setText(myHandle.handleString(item.getValueItem() + "") + ",000 VND");
 
         if (item.getTypeItem() == 0) {
             holder.txtValueItem.setTextColor(mContext.getResources().getColor(R.color.color_income));
@@ -94,15 +100,24 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
         holder.image_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                myDb = new MyDatabase(mContext);
-
-                if (myDb.deleteItem(item.getIdItem()) != 0) {
-                    itemList.remove(position);
-                    Toast.makeText(mContext, "Deleted success!", Toast.LENGTH_SHORT).show();
-                    notifyDataSetChanged();
-                } else {
-                    Toast.makeText(mContext, "Delete fail! " + myDb.deleteItem(item.getIdItem()), Toast.LENGTH_SHORT).show();
-                }
+                new AlertDialog.Builder(mContext)
+                        .setView(R.layout.layout_confirm_delete)
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                myDb = new MyDatabase(mContext);
+                                if (myDb.deleteItem(item.getIdItem()) != 0) {
+                                    itemList.remove(position);
+                                    Toast.makeText(mContext, "Deleted success!", Toast.LENGTH_SHORT).show();
+                                    notifyDataSetChanged();
+                                } else {
+                                    Toast.makeText(mContext, "Delete fail! " + myDb.deleteItem(item.getIdItem()), Toast.LENGTH_SHORT).show();
+                                }
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {}
+                        })
+                        .show();
             }
         });
 
@@ -135,24 +150,5 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
                 image_category_item.setImageResource(resId);
             }
         }
-    }
-
-    public String handleString(String str) {
-        String newString;
-        switch (str.length()) {
-            case 4:
-                newString = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            case 5:
-                newString = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 6:
-                newString = new StringBuilder(str).insert(3, ",").toString();
-                break;
-            default:
-                newString = str;
-                break;
-        }
-        return newString;
     }
 }

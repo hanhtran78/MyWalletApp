@@ -21,7 +21,6 @@ public class ReportDetailActivity extends AppCompatActivity {
 
     private MyDatabase myDB;
     private AdapterListViewDetailReport mAdapter;
-    private MyHandle myHandle;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,7 +33,7 @@ public class ReportDetailActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getBundleExtra("data");
         mTitleReport.setText(bundle.getString("title"));
 
-        itemList = myDB.getObjectByMonth(myHandle.convertMonthTypeStringToNum(bundle.getString("month")));
+        itemList = myDB.getObjectByMonth(bundle.getString("month"));
         mAdapter = new AdapterListViewDetailReport(this, itemList);
         mListViewReport.setAdapter(mAdapter);
     }
@@ -43,7 +42,6 @@ public class ReportDetailActivity extends AppCompatActivity {
         mTitleReport = (TextView) findViewById(R.id.toolbar_title);
         mListViewReport = (ListView) findViewById(R.id.list_view_detail_report);
         myDB = new MyDatabase(this);
-        myHandle = new MyHandle();
     }
 
     @Override

@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:screenOrientation="locked"
     tools:context=".WalletManagerActivity">
 
     <include layout="@layout/toolbar_wallet_manager" />
@@ -67,5 +68,6 @@
             android:text="No data to show!"
             android:visibility="gone" />
     </LinearLayout>
+
 
 </LinearLayout>

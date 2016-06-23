@@ -169,7 +169,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
                 mTextValue.setText("0");
 
-            } else if (valueInput.length() < 6) {
+            } else if (valueInput.length() < 9) {
                 valueInput += ((TextView) v).getText().toString();
             } else {
                 Toast.makeText(ItemActivity.this, "Value is very large! " + valueInput, Toast.LENGTH_SHORT).show();

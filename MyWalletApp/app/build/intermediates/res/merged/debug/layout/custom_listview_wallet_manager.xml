@@ -3,51 +3,49 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:paddingBottom="5dp"
     android:paddingLeft="3dp"
     android:paddingRight="3dp"
-    android:paddingTop="5dp"
     android:weightSum="7">
 
     <ImageView
         android:id="@+id/image_category_item"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:paddingLeft="5dp"
         android:src="@mipmap/ic_salary_small" />
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_weight="3"
-        android:weightSum="2"
+        android:gravity="center_vertical"
         android:orientation="vertical"
-        android:paddingLeft="10dp">
+        android:paddingLeft="10dp"
+        android:weightSum="2">
 
         <TextView
             android:id="@+id/txtName"
             android:layout_width="wrap_content"
-            android:layout_weight="1"
             android:layout_height="wrap_content"
-            android:text="Item name"
+            android:layout_weight="1"
             android:singleLine="true"
+            android:text="Item name"
             android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
             android:id="@+id/txtDate"
-            android:layout_weight="1"
-            android:singleLine="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:singleLine="true"
             android:text="Date"
             android:textAppearance="?android:attr/textAppearanceMedium" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
         android:layout_gravity="end|center_horizontal"
         android:layout_weight="3"
         android:gravity="end|center_horizontal"
@@ -56,38 +54,31 @@
         <TextView
             android:id="@+id/txtValue"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="right|center_horizontal"
+            android:layout_height="match_parent"
+            android:gravity="right|center_vertical"
             android:paddingRight="2dp"
-            android:paddingTop="12dp"
             android:singleLine="true"
             android:text="value"
             android:textAppearance="?android:attr/textAppearanceLarge" />
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="wrap_content"
+
+    <ImageView
+        android:id="@+id/image_edit"
+        android:layout_width="50dp"
         android:layout_height="match_parent"
-        android:gravity="center_horizontal"
-        android:paddingTop="5dp">
+        android:layout_gravity="center"
+        android:background="#abe49b"
+        android:paddingRight="2dp"
+        android:src="@mipmap/ic_edit"
+        android:visibility="gone" />
 
-        <ImageView
-            android:id="@+id/image_edit"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="#abe49b"
-            android:paddingRight="2dp"
-            android:src="@mipmap/ic_edit"
-            android:visibility="gone" />
-
-        <ImageView
-            android:id="@+id/image_delete"
-            android:layout_width="50dp"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:background="#f2dea2"
-            android:src="@mipmap/ic_delete"
-            android:visibility="gone" />
-    </LinearLayout>
+    <ImageView
+        android:id="@+id/image_delete"
+        android:layout_width="50dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="center"
+        android:background="#f2dea2"
+        android:src="@mipmap/ic_delete"
+        android:visibility="gone" />
 </LinearLayout>

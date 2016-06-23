@@ -20,23 +20,16 @@ public class Category implements Serializable{
         return idCategory;
     }
 
-    public void setIdCategory(int idCategory) {
-        this.idCategory = idCategory;
-    }
-
     public String getNameCategory() {
         return nameCategory;
-    }
-
-    public void setNameCategory(String nameCategory) {
-        this.nameCategory = nameCategory;
     }
 
     public String getNameIconCategory() {
         return nameIconCategory;
     }
 
-    public void setNameIconCategory(String nameIconCotegory) {
-        this.nameIconCategory = nameIconCotegory;
+    public boolean isCategory(){
+        return true;
     }
+
 }
