@@ -5,6 +5,8 @@ import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.DatePicker;
@@ -14,13 +16,9 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.math.BigInteger;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 
-import hanhit.mywalletapp.adapter.AdapterListViewWalletManager;
 import hanhit.mywalletapp.database.MyDatabase;
 import hanhit.mywalletapp.model.Category;
 import hanhit.mywalletapp.model.Item;
@@ -29,7 +27,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
     private TextView mTitleToolbar;
     private TextView mTextIncome, mTextExpense, mTextValue, mTextZero,
-            mTextVND, mTextDate;
+            mTextVND, mTextDate, mIncomeTrans, mExpenseTrans;
     private EditText mEditNoteItem;
     private ImageView mImageDate, mImageCategory, mChoseCategory;
     private Spinner mSpinnerCategory;
@@ -79,7 +77,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 incomeClicked = false;
             }
-            setColorWhenIncomeOrExpensePress();
 
             valueInput = itemReceive.getValueItem() + "";
             mTextDate.setText(itemReceive.getDateItem());
@@ -89,7 +86,6 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             mSpinnerCategory.setSelection(itemReceive.getIdCategoryItem());
             showImageByName("ic_" + mSpinnerCategory.getSelectedItem().toString());
 
-//            Toast.makeText(ItemActivity.this, "Edit -- Update value for views", Toast.LENGTH_SHORT).show();
         } else {
             Calendar calendar = Calendar.getInstance();
             // Set current date for item
@@ -99,18 +95,23 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
         // Handle when press INCOME or EXPENSE
         setColorWhenIncomeOrExpensePress();
+
         mTextIncome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                incomeClicked = true;
-                setColorWhenIncomeOrExpensePress();
+                if (!incomeClicked) {
+                    incomeClicked = true;
+                    setColorWhenIncomeOrExpensePress();
+                }
             }
         });
         mTextExpense.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                incomeClicked = false;
-                setColorWhenIncomeOrExpensePress();
+                if (incomeClicked) {
+                    incomeClicked = false;
+                    setColorWhenIncomeOrExpensePress();
+                }
             }
         });
         // End handle
@@ -269,6 +270,9 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mTextVND = (TextView) findViewById(R.id.txt_vnd_acti_item);
         mTextDate = (TextView) findViewById(R.id.txt_date_acti_item);
 
+        mExpenseTrans = (TextView) findViewById(R.id.txt_expense_trans);
+        mIncomeTrans = (TextView) findViewById(R.id.txt_income_trans);
+
         mEditNoteItem = (EditText) findViewById(R.id.edit_note_acti_item);
         mImageDate = (ImageView) findViewById(R.id.image_date_acti_item);
         mImageCategory = (ImageView) findViewById(R.id.image_category_acti_item);
@@ -305,21 +309,26 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
 
     public void setColorWhenIncomeOrExpensePress() {
         if (incomeClicked) {
-            mTextIncome.setBackgroundResource(R.drawable.border_text_view_income);
+            Animation mLoadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.right_to_left);
+            mIncomeTrans.setBackgroundResource(R.drawable.border_text_view_income);
+            mIncomeTrans.startAnimation(mLoadAnimation);
+
             mTextIncome.setTextColor(Color.WHITE);
             mTextExpense.setTextColor(Color.BLACK);
-            mTextExpense.setBackgroundResource(R.drawable.border_text_view_normal);
+            mExpenseTrans.setBackgroundResource(android.R.color.transparent);
 
             mTextValue.setTextColor(getResources().getColor(R.color.color_income));
             mTextZero.setTextColor(getResources().getColor(R.color.color_income));
             mTextVND.setTextColor(getResources().getColor(R.color.color_income));
         } else {
-            mTextExpense.setBackgroundResource(R.drawable.border_text_view_expense);
+            Animation mLoadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.left_to_right);
+            mExpenseTrans.setBackgroundResource(R.drawable.border_text_view_expense);
+            mExpenseTrans.startAnimation(mLoadAnimation);
+
             mTextExpense.setTextColor(Color.WHITE);
             mTextIncome.setTextColor(Color.BLACK);
-            mTextIncome.setBackgroundResource(R.drawable.border_text_view_normal);
+            mIncomeTrans.setBackgroundResource(android.R.color.transparent);
 
-            mTextExpense.setBackgroundResource(R.drawable.border_text_view_expense);
             mTextValue.setTextColor(getResources().getColor(R.color.color_expense));
             mTextZero.setTextColor(getResources().getColor(R.color.color_expense));
             mTextVND.setTextColor(getResources().getColor(R.color.color_expense));

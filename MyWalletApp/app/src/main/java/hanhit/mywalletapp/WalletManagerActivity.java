@@ -70,9 +70,6 @@ public class WalletManagerActivity extends AppCompatActivity {
                 startActivity(startAddItemActivity);
                 overridePendingTransition(R.anim.fade_in, R.anim.fade_out);
 
-//                Animation mLoadAnimation = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.fade_in);
-//                mLoadAnimation.setDuration(7000);
-//                mImageAddItem.startAnimation(mLoadAnimation);
             }
         });
 
