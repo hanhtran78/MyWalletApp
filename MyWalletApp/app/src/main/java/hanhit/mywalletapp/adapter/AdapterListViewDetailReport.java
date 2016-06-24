@@ -9,6 +9,7 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import hanhit.mywalletapp.MyHandle;
@@ -52,13 +53,13 @@ public class AdapterListViewDetailReport extends BaseAdapter {
 
                 TextView value_category = (TextView) view.findViewById(R.id.txt_value_category_report);
 
-                int valueInt = getValueAllItemByCategory(category.getIdCategory());
-                if (valueInt >= 0) {
+                BigInteger valueInt = getValueAllItemByCategory(category.getIdCategory());
+                if (valueInt.compareTo(BigInteger.valueOf(0)) >= 0) {
                     value_category.setTextColor(mContext.getResources().getColor(R.color.color_income));
                 } else {
                     value_category.setTextColor(mContext.getResources().getColor(R.color.color_expense));
                 }
-                String valueStr = myHandle.handleString(valueInt + "");
+                String valueStr = myHandle.handleStringValue(valueInt + "");
                 value_category.setText(valueStr + ",000 VND");
 
             } catch (ClassCastException e) {
@@ -77,8 +78,8 @@ public class AdapterListViewDetailReport extends BaseAdapter {
                 } else {
                     txt_value_item.setTextColor(mContext.getResources().getColor(R.color.color_expense));
                 }
-                String value = item.getValueItem() + "";
-                txt_value_item.setText(myHandle.handleString(value) + ",000 VND");
+                String value = item.getValueItem();
+                txt_value_item.setText(myHandle.handleStringValue(value) + ",000 VND");
             }
         }
 
@@ -100,21 +101,23 @@ public class AdapterListViewDetailReport extends BaseAdapter {
         return 0;
     }
 
-    public int getValueAllItemByCategory(int id_cate) {
-        int sumIncome = 0;
-        int sumExpense = 0;
+    public BigInteger getValueAllItemByCategory(int id_cate) {
+        BigInteger sumIncome = BigInteger.valueOf(0);
+        BigInteger sumExpense = BigInteger.valueOf(0);
         for (int i = 0; i < objects.size(); i++) {
             try {
                 Item item = (Item) objects.get(i);
                 if (item.getIdCategoryItem() == id_cate) {
                     if (item.getTypeItem() == 0) {
-                        sumIncome += item.getValueItem();
+                        BigInteger income = BigInteger.valueOf(Integer.parseInt(item.getValueItem()));
+                        sumIncome = sumIncome.add(income);
                     } else {
-                        sumExpense += item.getValueItem();
+                        BigInteger expense = BigInteger.valueOf(Integer.parseInt(item.getValueItem()));
+                        sumExpense = sumExpense.add(expense);
                     }
                 }
             } catch (ClassCastException ex) {}
         }
-        return (sumIncome - sumExpense);
+        return sumIncome.subtract(sumExpense);
     }
 }

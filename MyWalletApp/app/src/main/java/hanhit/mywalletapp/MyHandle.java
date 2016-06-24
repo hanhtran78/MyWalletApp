@@ -11,100 +11,41 @@ public class MyHandle {
     public MyHandle() {
     }
 
-    public String handleString(String str) {
-        String newString;
+    public String handleStringValue(String str) {
         boolean sub = false;
         if (str.contains("-")) {
             sub = true;
             str = str.replace("-", "");
         }
-        switch (str.length()) {
-            case 4:
-                newString = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            case 5:
-                newString = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 6:
-                newString = new StringBuilder(str).insert(3, ",").toString();
-                break;
-            case 7:
-                newString = new StringBuilder(str).insert(1, ",").insert(5, ",").toString();
-                break;
-            case 8:
-                newString = new StringBuilder(str).insert(2, ",").insert(6, ",").toString();
-                break;
-            case 9:
-                newString = new StringBuilder(str).insert(3, ",").insert(7, ",").toString();
-                break;
-            default:
-                newString = str;
-                break;
-        }
-        if (sub) {
-            newString = new StringBuilder(newString).insert(0, "-").toString();
-        }
-        return newString;
-    }
 
-    public String handBackSpace(String str) {
-        String newStr;
-        switch (str.length()) {
-            case 8:
-                newStr = new StringBuilder(str).insert(2,",").insert(6,",").toString();
-                break;
-            case 7:
-                newStr = new StringBuilder(str).insert(1,",").insert(5,",").toString();
-                break;
-            case 6:
-                newStr = new StringBuilder(str).insert(3,",").toString();
-                break;
-            case 5:
-                newStr = new StringBuilder(str).insert(2, ",").toString();
-                break;
-            case 4:
-                newStr = new StringBuilder(str).insert(1, ",").toString();
-                break;
-            default:
-                newStr = str;
-                break;
+        if (str.length() >= 4) {
+            int num_comma = str.length() / 3;
+            int first_comma = str.length() % 3;
+
+            if (first_comma != 0) {
+                for (int i = 0; i < num_comma; i++) {
+                    str = new StringBuilder(str).insert(first_comma, ",").toString();
+                    first_comma += 4;
+                }
+            } else {
+                for (int i = 0; i < num_comma - 1; i++) {
+                    first_comma += 3;
+                    str = new StringBuilder(str).insert(first_comma, ",").toString();
+                    first_comma += 1;
+                }
+            }
         }
-        return newStr;
+
+        if (sub) {
+            str = new StringBuilder(str).insert(0, "-").toString();
+        }
+        return str;
     }
 
     // Method format date
     public String formatDate(Date date) {
         return new SimpleDateFormat("dd-MM-yyyy").format(date);
     }
-
-//    public String convertMonthTypeStringToNum(String month) {
-//        switch (month) {
-//            case "JANUARY":
-//                return "01";
-//            case "FEBRUARY":
-//                return "02";
-//            case "MARCH":
-//                return "03";
-//            case "APRIL":
-//                return "04";
-//            case "MAY":
-//                return "05";
-//            case "JUNE":
-//                return "06";
-//            case "JULY":
-//                return "07";
-//            case "AUGUST":
-//                return "08";
-//            case "SEPTEMBER":
-//                return "09";
-//            case "OCTOBER":
-//                return "10";
-//            case "NOVEMBER":
-//                return "11";
-//            default:
-//                return "12";
-//        }
-//    }
 
     public String getMonth(String date) {
         String[] times = date.split("-");

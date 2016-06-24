@@ -14,6 +14,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -30,7 +31,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     private TextView mTextIncome, mTextExpense, mTextValue, mTextZero,
             mTextVND, mTextDate;
     private EditText mEditNoteItem;
-    private ImageView mImageDate, mImageCategory, mChoiseCategory;
+    private ImageView mImageDate, mImageCategory, mChoseCategory;
     private Spinner mSpinnerCategory;
 
     /* Keyboard*/
@@ -83,7 +84,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             valueInput = itemReceive.getValueItem() + "";
             mTextDate.setText(itemReceive.getDateItem());
 
-            mTextValue.setText(myHandle.handleString(valueInput));
+            mTextValue.setText(myHandle.handleStringValue(valueInput));
             mEditNoteItem.setText(itemReceive.getNameItem());
             mSpinnerCategory.setSelection(itemReceive.getIdCategoryItem());
             showImageByName("ic_" + mSpinnerCategory.getSelectedItem().toString());
@@ -138,7 +139,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        mChoiseCategory.setOnClickListener(new View.OnClickListener() {
+        mChoseCategory.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 mSpinnerCategory.performClick();
@@ -163,18 +164,16 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         // handle number button click
-
         if (v.getTag() != null && "number_button".equals(v.getTag())) {
-            if (((TextView) v).getText().toString().equals("0") && mTextValue.getText().equals("0")) {
-
-                mTextValue.setText("0");
+            if (((TextView) v).getText().toString().equals("0") && valueInput.equals("")) {
 
             } else if (valueInput.length() < 9) {
                 valueInput += ((TextView) v).getText().toString();
             } else {
-                Toast.makeText(ItemActivity.this, "Value is very large! " + valueInput, Toast.LENGTH_SHORT).show();
+                Toast.makeText(ItemActivity.this, "Value is very large!", Toast.LENGTH_SHORT).show();
             }
-            mTextValue.setText(myHandle.handleString(valueInput));
+            if (valueInput.length() > 0)
+                mTextValue.setText(myHandle.handleStringValue(valueInput));
         }
         switch (v.getId()) {
             case R.id.key_backspace:
@@ -182,7 +181,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
                     String newValue = new StringBuilder(valueInput)
                             .deleteCharAt(valueInput.length() - 1).toString();
                     valueInput = newValue;
-                    mTextValue.setText(myHandle.handBackSpace(newValue));
+                    mTextValue.setText(myHandle.handleStringValue(newValue));
 
                 } else if (valueInput.length() == 1) {
                     valueInput = "";
@@ -207,13 +206,12 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void addNewItem() {
-        int id = myDb.numberItem();
-        id += 2;
+        int id = myDb.getIdOfLastItem() + 1;
         int type = 0;
         if (!incomeClicked)
             type = 1;
         String note = mEditNoteItem.getText().toString();
-        int value = Integer.parseInt(valueInput);
+        String value = valueInput;
         String date = mTextDate.getText().toString();
         int categoryItem = mSpinnerCategory.getSelectedItemPosition();
         if (myDb.insertItem(new Item(id, type, note, date, value, categoryItem))) {
@@ -238,7 +236,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         if (!incomeClicked)
             type = 1;
         String note = mEditNoteItem.getText().toString();
-        int value = Integer.parseInt(valueInput);
+        String value = valueInput;
         String date = mTextDate.getText().toString();
         int categoryItem = 0;
         if (mSpinnerCategory.getSelectedItem().equals("shop")) {
@@ -274,7 +272,7 @@ public class ItemActivity extends AppCompatActivity implements View.OnClickListe
         mEditNoteItem = (EditText) findViewById(R.id.edit_note_acti_item);
         mImageDate = (ImageView) findViewById(R.id.image_date_acti_item);
         mImageCategory = (ImageView) findViewById(R.id.image_category_acti_item);
-        mChoiseCategory = (ImageView) findViewById(R.id.image_choise_category_acti_item);
+        mChoseCategory = (ImageView) findViewById(R.id.image_chose_category_acti_item);
 
         mKey0 = (TextView) findViewById(R.id.key_0);
         mKey1 = (TextView) findViewById(R.id.key_1);

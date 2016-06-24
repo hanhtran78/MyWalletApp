@@ -35,6 +35,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
     private ArrayList<Item> itemList;
     private MyDatabase myDb;
     private MyHandle myHandle;
+    private Handler mHandler;
 
     public AdapterListViewWalletManager(Activity context, int resource, ArrayList<Item> objects) {
         super(context, resource, objects);
@@ -47,6 +48,8 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
     public View getView(final int position, View convertView, ViewGroup parent) {
         final Item itemSelected = itemList.get(position);
         final ViewHolderItem holder;
+        mHandler = new Handler();
+
         View view = convertView;
         if (view == null) {
             myHandle = new MyHandle();
@@ -69,7 +72,7 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
         final Item item = itemList.get(position);
         holder.txtNameItem.setText(item.getNameItem());
         holder.txtDateOfItem.setText(item.getDateItem());
-        holder.txtValueItem.setText(myHandle.handleString(item.getValueItem() + "") + ",000 VND");
+        holder.txtValueItem.setText(myHandle.handleStringValue(item.getValueItem()) + ",000 VND");
 
         if (item.getTypeItem() == 0) {
             holder.txtValueItem.setTextColor(mContext.getResources().getColor(R.color.color_income));
@@ -126,6 +129,14 @@ public class AdapterListViewWalletManager extends ArrayAdapter<Item> {
             public boolean onLongClick(View v) {
                 holder.image_edit.setVisibility(View.VISIBLE);
                 holder.image_delete.setVisibility(View.VISIBLE);
+
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        holder.image_edit.setVisibility(View.GONE);
+                        holder.image_delete.setVisibility(View.GONE);
+                    }
+                }, 3000);       //3000 = 3s
                 return false;
             }
         });

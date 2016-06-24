@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.samsistemas.calendarview.widget.CalendarView;
 
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,14 +81,15 @@ public class WalletManagerActivity extends AppCompatActivity {
             public void onClick(View v) {
                 // get value balance, income, expense from data
                 // Show Dialog Report Of Month
-                int[] sumValues = myDB.getValueAllByMonth(currentMonthOfCalendar);
-                int income = sumValues[0];
-                int expense = sumValues[1];
+                BigInteger[] sumValues = myDB.getValueAllByMonth(currentMonthOfCalendar);
+                BigInteger income = sumValues[0];
+                BigInteger expense = sumValues[1];
+                BigInteger balance = income.subtract(expense);
                 String month = mCalendar.getCurrentMonth();
-                if (income == expense && income == 0) {
+                if (income == expense && income.equals(BigInteger.valueOf(0))) {
                     Toast.makeText(WalletManagerActivity.this, "The " + month + " no have data to show!", Toast.LENGTH_SHORT).show();
                 } else {
-                    createDialogReport(month, income - expense, income, expense);
+                    createDialogReport(month, balance, income, expense);
                 }
             }
         });
@@ -122,8 +124,15 @@ public class WalletManagerActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        loadDataByDate(myHandle.formatDate(Calendar.getInstance().getTime()));
-//        Toast.makeText(WalletManagerActivity.this, "Count number item: " + myDB.numberItem(), Toast.LENGTH_LONG).show();
+        String currentTime = myHandle.formatDate(Calendar.getInstance().getTime());
+        String currentMonth = myHandle.getMonth(currentTime);
+
+        if (currentMonth.equals(currentMonthOfCalendar)){
+            loadDataByDate(currentTime);
+        } else {
+            itemList = myDB.getAllItemByMonth(currentMonthOfCalendar);
+            updateListViewWalletManager();
+        }
     }
 
     public void loadDataByDate(String date) {
@@ -145,7 +154,7 @@ public class WalletManagerActivity extends AppCompatActivity {
         }
     }
 
-    public void createDialogReport(final String month, int balance, int income, int expense) {
+    public void createDialogReport(String month, BigInteger balance, BigInteger income, BigInteger expense) {
         final Dialog dialog = new Dialog(WalletManagerActivity.this);
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
         dialog.setContentView(R.layout.custom_dialog_content_report);
@@ -159,13 +168,13 @@ public class WalletManagerActivity extends AppCompatActivity {
         title_dialog.setText(title);
 
         TextView balance_value = (TextView) dialog.findViewById(R.id.txt_value_balance_dialog);
-        balance_value.setText(myHandle.handleString(balance + "") + ",000 VND");
+        balance_value.setText(myHandle.handleStringValue(balance + "") + ",000 VND");
 
         TextView income_value = (TextView) dialog.findViewById(R.id.txt_value_income_dialog);
-        income_value.setText(myHandle.handleString(income + "") + ",000 VND ");
+        income_value.setText(myHandle.handleStringValue(income + "") + ",000 VND ");
 
         TextView expense_value = (TextView) dialog.findViewById(R.id.txt_value_expense_dialog);
-        expense_value.setText(myHandle.handleString(expense + "") + ",000 VND ");
+        expense_value.setText(myHandle.handleStringValue(expense + "") + ",000 VND ");
 
         ImageView image_detail = (ImageView) dialog.findViewById(R.id.image_detail_dialog);
         image_detail.setOnClickListener(new View.OnClickListener() {

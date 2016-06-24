@@ -7,6 +7,7 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public class MyDatabase extends SQLiteOpenHelper {
             + COL_TYPE_ITEM + " integer not null, "
             + COL_NAME_ITEM + " text, "
             + COL_DATE_ITEM + " text not null, "
-            + COL_VALUE_ITEM + " integer not null, "
+            + COL_VALUE_ITEM + " text not null, "
             + COL_CATEGORY_ID_ITEM + " integer not null);";
 
     // Table Categories
@@ -70,19 +71,6 @@ public class MyDatabase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
         onCreate(db);
     }
-
-//    public Item getItem(int id) {
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor res = db.rawQuery("select * from items where idItem = " + id + "", null);
-//        Item item = new Item(
-//                res.getInt(res.getColumnIndex(COL_ID_ITEM)),
-//                res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
-//                res.getString(res.getColumnIndex(COL_NAME_ITEM)),
-//                res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-//                res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
-//                res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)));
-//        return item;
-//    }
 
     public Category getCategory(int id) {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -177,26 +165,34 @@ public class MyDatabase extends SQLiteOpenHelper {
         return db.delete(TABLE_ITEMS, COL_ID_ITEM + " = " + id, null);
     }
 
-//    public ArrayList<Item> getAllItem() {
-//        ArrayList<Item> array_list = new ArrayList<>();
-//
-//        SQLiteDatabase db = this.getReadableDatabase();
-//        Cursor res = db.rawQuery("select * from items", null);
-//        res.moveToFirst();
-//
-//        while (res.isAfterLast() == false) {
-//            array_list.add(new Item(
-//                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
-//                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
-//                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
-//                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-//                    res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
-//                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
-//            );
-//            res.moveToNext();
-//        }
-//        return array_list;
-//    }
+    public int getIdOfLastItem() {
+        ArrayList<Item> items = getAllItem();
+        if (items.size() == 0) {
+            return 0;
+        } else {
+            return items.get(items.size() - 1).getIdItem();
+        }
+    }
+
+    public ArrayList<Item> getAllItem() {
+        ArrayList<Item> array_list = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from items", null);
+        res.moveToFirst();
+
+        while (res.isAfterLast() == false) {
+            array_list.add(new Item(
+                    res.getInt(res.getColumnIndex(COL_ID_ITEM)),
+                    res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
+                    res.getString(res.getColumnIndex(COL_NAME_ITEM)),
+                    res.getString(res.getColumnIndex(COL_DATE_ITEM)),
+                    res.getString(res.getColumnIndex(COL_VALUE_ITEM)),
+                    res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
+            );
+            res.moveToNext();
+        }
+        return array_list;
+    }
 
     public ArrayList<Item> getAllItemByDate(String date) {
         ArrayList<Item> array_list = new ArrayList<>();
@@ -211,7 +207,7 @@ public class MyDatabase extends SQLiteOpenHelper {
                         res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
                         res.getString(res.getColumnIndex(COL_NAME_ITEM)),
                         res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                        res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+                        res.getString(res.getColumnIndex(COL_VALUE_ITEM)),
                         res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
                 );
             }
@@ -233,7 +229,7 @@ public class MyDatabase extends SQLiteOpenHelper {
                         res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
                         res.getString(res.getColumnIndex(COL_NAME_ITEM)),
                         res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                        res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+                        res.getString(res.getColumnIndex(COL_VALUE_ITEM)),
                         res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
                 );
             }
@@ -256,7 +252,7 @@ public class MyDatabase extends SQLiteOpenHelper {
                         res.getInt(res.getColumnIndex(COL_TYPE_ITEM)),
                         res.getString(res.getColumnIndex(COL_NAME_ITEM)),
                         res.getString(res.getColumnIndex(COL_DATE_ITEM)),
-                        res.getInt(res.getColumnIndex(COL_VALUE_ITEM)),
+                        res.getString(res.getColumnIndex(COL_VALUE_ITEM)),
                         res.getInt(res.getColumnIndex(COL_CATEGORY_ID_ITEM)))
                 );
             }
@@ -265,9 +261,9 @@ public class MyDatabase extends SQLiteOpenHelper {
         return array_list;
     }
 
-    public int[] getValueAllByMonth(String month) {
-        int sumIncome = 0;
-        int sumExpense = 0;
+    public BigInteger[] getValueAllByMonth(String month) {
+        BigInteger sumIncome = BigInteger.valueOf(0);
+        BigInteger sumExpense = BigInteger.valueOf(0);
 
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor res = db.rawQuery("select  * from items", null);
@@ -276,14 +272,16 @@ public class MyDatabase extends SQLiteOpenHelper {
         while (res.isAfterLast() == false) {
             if (myHandle.getMonth(res.getString(res.getColumnIndex(COL_DATE_ITEM))).equals(month)) {
                 if (res.getInt(res.getColumnIndex(COL_TYPE_ITEM)) == 0) {
-                    sumIncome += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
+                    BigInteger income = BigInteger.valueOf(Integer.parseInt(res.getString(res.getColumnIndex(COL_VALUE_ITEM))));
+                    sumIncome = sumIncome.add(income);
                 } else {
-                    sumExpense += res.getInt(res.getColumnIndex(COL_VALUE_ITEM));
+                    BigInteger expense = BigInteger.valueOf(Integer.parseInt(res.getString(res.getColumnIndex(COL_VALUE_ITEM))));
+                    sumExpense = sumExpense.add(expense);
                 }
             }
             res.moveToNext();
         }
-        int[] values = new int[]{sumIncome, sumExpense};
+        BigInteger[] values = new BigInteger[]{sumIncome, sumExpense};
         return values;
     }
 

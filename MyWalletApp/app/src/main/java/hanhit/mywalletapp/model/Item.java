@@ -1,6 +1,7 @@
 package hanhit.mywalletapp.model;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.Date;
 
 /**
@@ -11,10 +12,10 @@ public class Item implements Serializable{
     private int typeItem;
     private String nameItem;
     private String dateItem;
-    private int valueItem;
+    private String valueItem;
     private int idCategoryItem;
 
-    public Item(int idItem, int typeItem, String nameItem, String dateItem, int valueItem, int idCategoryItem) {
+    public Item(int idItem, int typeItem, String nameItem, String dateItem, String valueItem, int idCategoryItem) {
         this.idItem = idItem;
         this.typeItem = typeItem;
         this.nameItem = nameItem;
@@ -51,11 +52,11 @@ public class Item implements Serializable{
         this.dateItem = dateItem;
     }
 
-    public int getValueItem() {
+    public String getValueItem() {
         return valueItem;
     }
 
-    public void setValueItem(int valueItem) {
+    public void setValueItem(String valueItem) {
         this.valueItem = valueItem;
     }
 
