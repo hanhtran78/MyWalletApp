@@ -5,3 +5,11 @@
 *.dex
 *.class
 *.properties
+app/build/
+*.gradle
+gradle/
+build/
+gradlew
+gradlew.bat
+.idea/
+app/proguard-rules.pro
